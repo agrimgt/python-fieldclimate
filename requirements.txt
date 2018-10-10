@@ -1,0 +1,3 @@
+aiohttp
+pycrypto
+requests
