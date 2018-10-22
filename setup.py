@@ -13,6 +13,7 @@ setup(
     version="0.1dev",
     packages=["fieldclimate"],
     package_data={"": ["*.txt", "*.rst"]},
+    install_requires=["aiohttp", "pycryptodome", "requests"],
     author="Agrimanagent, Inc.",
     author_email="pmarshall@agrimgt.com",
     description="A client for the iMetos FieldClimate API.",
