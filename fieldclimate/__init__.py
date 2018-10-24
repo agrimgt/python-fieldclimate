@@ -1,57 +1,286 @@
 """A client for the iMetos FieldClimate API."""
-from fieldclimate.client import HmacClient, AsynchronousClient, SynchronousClient
-from fieldclimate.commands import FieldClimateCommands
 
-__all__ = ["FieldClimateAsync", "FieldClimateSync"]
+__all__ = ["FieldClimateClient"]
+__version__ = "0.1dev"
 __author__ = "Agrimanagement, Inc."
 
-
-class FieldClimateAsync(FieldClimateCommands, HmacClient, AsynchronousClient):
-    """Adapt aiohttp.ClientSession to FieldClimate's API.
-
-    Full description of all methods: https://api.fieldclimate.com/v1/docs/
-
-    To use this class, HMAC public and private keys must be provided either
-    by specifying them in __init__ calls or subclass variables, or by, or by through
-    (which must be provided to you by FieldClimate as described in the docs above)
-    must be specified setting them in __init__ or in environment variables.
-
-    To make requests, use FieldClimateClient as a context manager and await
-    the api methods for dictionary responses:
-
-    >>> async def print_user_json():
-    ...     async with FieldClimateAsync() as client:
-    ...         user = await client.get_user()
-    ...         print(user)
-    ...
-    >>> import asyncio
-    >>> asyncio.get_event_loop().run_until_complete(print_user_json())
-    {'username': '...', }
-    >>>
-
-    TODO: Rate limiting not implemented currently. The server does not enforce any limit,
-    but I have been able to DOS the server with too many requests. Use with caution!
-
-    If you overload the server, it may start returning 502 response codes.
-    """
+from fieldclimate.client import HmacClient
+from fieldclimate.utils import *
 
 
-class FieldClimateSync(FieldClimateCommands, HmacClient, SynchronousClient):
-    """Adapt Requests to FieldClimate's API.
+class FieldClimateClient(HmacClient):
+    """Adapt the aiohttp and requests libraries to FieldClimate's API,
+    switching between them depending on synchronous/asynchronous usage.
+
+    Requires HMAC public and private keys for authentication.
+
+    Usage: See README.rst
 
     Full description of all methods: https://api.fieldclimate.com/v1/docs/
-
-    To use this class, HMAC public and private keys must be provided either
-    by specifying them in __init__ calls or subclass variables, or by, or by through
-    (which must be provided to you by FieldClimate as described in the docs above)
-    must be specified setting them in __init__ or in environment variables.
-
-    To make requests, call FieldClimateSync methods to get dictionary responses:
-
-    >>> print(FieldClimateSync().get_user())
-    {'username': '...', }
-    >>>
-
-    The interface is much easier compared to FieldClimateAsync, but it will
-    perform much slower when you need to request a lot of stuff at once.
     """
+
+    base_url = "https://api.fieldclimate.com/v1"
+    settings_prefix = "FIELDCLIMATE"
+
+    def get_user(self):
+        """Read user information"""
+        route = "/user"
+        return self.get(route)
+
+    def put_user(self, data):
+        """Update user information"""
+        route = "/user"
+        return self.put(route, data)
+
+    def delete_user(self):
+        """Delete user account"""
+        route = "/user"
+        return self.delete(route)
+
+    def get_user_stations(self):
+        """Read list of stations of a user"""
+        route = "/user/stations"
+        return self.get(route)
+
+    def get_user_licenses(self):
+        """Read user licenses"""
+        route = "/user/licenses"
+        return self.get(route)
+
+    def get_system_status(self):
+        """System running correctly"""
+        route = "/system/status"
+        return self.get(route)
+
+    def get_system_sensors(self):
+        """Supported sensors"""
+        route = "/system/sensors"
+        return self.get(route)
+
+    def get_system_groups(self):
+        """Supported sensor groups"""
+        route = "/system/groups"
+        return self.get(route)
+
+    def get_system_group_sensors(self):
+        """Sensors organized in groups"""
+        route = "/system/group/sensors"
+        return self.get(route)
+
+    def get_system_types(self):
+        """Type of devices"""
+        route = "/system/types"
+        return self.get(route)
+
+    def get_system_countries(self):
+        """Countries for the languages"""
+        route = "/system/countries"
+        return self.get(route)
+
+    def get_system_timezones(self):
+        """Timezones"""
+        route = "/system/timezones"
+        return self.get(route)
+
+    def get_system_diseases(self):
+        """Disease models"""
+        route = "/system/diseases"
+        return self.get(route)
+
+    def get_station(self, station_id):
+        """Read station information"""
+        route = f"/station/{station_id}"
+        return self.get(route)
+
+    def put_station(self, station_id, data):
+        """Update station information"""
+        route = f"/station/{station_id}"
+        return self.put(route, data)
+
+    def get_station_sensors(self, station_id):
+        """Get list of sensors of a station"""
+        route = f"/station/{station_id}/sensors"
+        return self.get(route)
+
+    def put_station_sensors(self, station_id, data):
+        """Update station sensor name"""
+        route = f"/station/{station_id}/sensors"
+        return self.put(route, data)
+
+    def get_station_nodes(self, station_id):
+        """Get list of nodes (wireless devices) connected to a station"""
+        route = f"/station/{station_id}/nodes"
+        return self.get(route)
+
+    def put_station_nodes(self, station_id, data):
+        """Update the name of a node itself"""
+        route = f"/station/{station_id}/nodes"
+        return self.put(route, data)
+
+    def get_station_serials(self, station_id):
+        """List of serials (of a sensor) and their names"""
+        route = f"/station/{station_id}/serials"
+        return self.get(route)
+
+    def put_station_serials(self, station_id, data):
+        """Update sensor with serial the name"""
+        route = f"/station/{station_id}/serials"
+        return self.put(route, data)
+
+    def post_station_key(self, station_id, station_key, data):
+        """Add station to user account"""
+        route = f"/station/{station_id}/{station_key}"
+        return self.post(route, data)
+
+    def delete_station_key(self, station_id, station_key):
+        """Remove station from user account"""
+        route = f"/station/{station_id}/{station_key}"
+        return self.delete(route)
+
+    def get_stations_in_proximity(self, station_id, radius):
+        """Stations in close proximity of specified station"""
+        route = f"/station/{station_id}/proximity/{radius}"
+        return self.get(route)
+
+    def get_station_events_last(self, station_id, amount, sort):
+        """Last station events"""
+        sort = clean_sort(sort)
+        route = f"/station/{station_id}/events/last/{amount}/{sort}"
+        return self.get(route)
+
+    def get_station_events(self, station_id, t_from, t_to, sort):
+        """Station events from to"""
+        t_from, t_to = clean_time(t_from, t_to)
+        sort = clean_sort(sort)
+        route = f"/station/{station_id}/events/from/{t_from}/to/{t_to}/{sort}"
+        return self.get(route)
+
+    def get_station_history_last(self, station_id, filter, amount, sort):
+        """Last station communication history filter"""
+        filter = clean_filter(filter)
+        sort = clean_sort(sort)
+        route = f"/station/{station_id}/history/{filter}/last/{amount}/{sort}"
+        return self.get(route)
+
+    def get_station_history(self, station_id, filter, t_from, t_to, sort):
+        """Station communication history from to filter"""
+        filter = clean_filter(filter)
+        t_from, t_to = clean_time(t_from, t_to)
+        sort = clean_sort(sort)
+        route = f"/station/{station_id}/history/{filter}/from/{t_from}/to/{t_to}/{sort}"
+        return self.get(route)
+
+    def get_station_licenses(self, station_id):
+        """Station licenses for disease models or forecast"""
+        route = f"/station/{station_id}/licenses"
+        return self.get(route)
+
+    def get_data_range(self, station_id):
+        """Min and Max date of data availability"""
+        route = f"/data/{station_id}"
+        return self.get(route)
+
+    def get_data_last(self, format, station_id, data_group, time_period):
+        """Reading last data"""
+        format = clean_format(format)
+        data_group = clean_data_group(data_group)
+        time_period = clean_time_period(time_period)
+        route = f"/data/{format}/{station_id}/{data_group}/last/{time_period}"
+        return self.get(route)
+
+    def get_data(self, format, station_id, data_group, t_from, t_to):
+        """Reading data of specific time period"""
+        format = clean_format(format)
+        t_from, t_to = clean_time(t_from, t_to)
+        data_group = clean_data_group(data_group)
+        route = f"/data/{format}/{station_id}/{data_group}/from/{t_from}/to/{t_to}"
+        return self.get(route)
+
+    def post_data_last(self, format, station_id, data_group, time_period, data):
+        """Filtered/Customized reading of last data"""
+        format = clean_format(format)
+        data_group = clean_data_group(data_group)
+        time_period = clean_time_period(time_period)
+        route = f"/data/{format}/{station_id}/{data_group}/last/{time_period}"
+        return self.post(route, data)
+
+    def post_data(self, format, station_id, data_group, t_from, t_to, data):
+        """Filtered/Customized reading of specified time period"""
+        format = clean_format(format)
+        t_from, t_to = clean_time(t_from, t_to)
+        data_group = clean_data_group(data_group)
+        route = f"/data/{format}/{station_id}/{data_group}/from/{t_from}/to/{t_to}"
+        return self.post(route, data)
+
+    def get_forecast(self, station_id, forecast_option):
+        """Forecast data package or image"""
+        route = f"/forecast/{station_id}/{forecast_option}"
+        return self.get(route)
+
+    def get_disease_last(self, station_id, time_period):
+        """Get last Evapotranspiration"""
+        time_period = clean_time_period(time_period)
+        route = f"/disease/{station_id}/last/{time_period}"
+        return self.get(route)
+
+    def get_disease(self, station_id, t_from, t_to):
+        """Get Evapotranspiration for specified period"""
+        t_from, t_to = clean_time(t_from, t_to)
+        route = f"/disease/{station_id}/from/{t_from}/to/{t_to}"
+        return self.get(route)
+
+    def post_disease_last(self, station_id, time_period, data):
+        """Get last specified disease model"""
+        time_period = clean_time_period(time_period)
+        route = f"/disease/{station_id}/last/{time_period}"
+        return self.post(route, data)
+
+    def post_disease(self, station_id, t_from, t_to, data):
+        """Get specified disease model for period"""
+        t_from, t_to = clean_time(t_from, t_to)
+        route = f"/disease/{station_id}/from/{t_from}/to/{t_to}"
+        return self.post(route, data)
+
+    def get_chart_last(self, type, station_id, data_group, time_period):
+        """Charting last data"""
+        data_group = clean_data_group(data_group)
+        time_period = clean_time_period(time_period)
+        route = f"/chart/{type}/{station_id}/{data_group}/last/{time_period}"
+        return self.get(route)
+
+    def get_chart(self, type, station_id, data_group, t_from, t_to):
+        """Charting for period"""
+        t_from, t_to = clean_time(t_from, t_to)
+        data_group = clean_data_group(data_group)
+        route = f"/chart/{type}/{station_id}/{data_group}/from/{t_from}/to/{t_to}"
+        return self.get(route)
+
+    def post_chart_last(self, type, station_id, data_group, time_period, data):
+        """Charting customized last data"""
+        data_group = clean_data_group(data_group)
+        time_period = clean_time_period(time_period)
+        route = f"/chart/{type}/{station_id}/{data_group}/last/{time_period}"
+        return self.post(route, data)
+
+    def post_chart(self, type, station_id, data_group, t_from, t_to, data):
+        """Charting customized for period"""
+        t_from, t_to = clean_time(t_from, t_to)
+        data_group = clean_data_group(data_group)
+        route = f"/chart/{type}/{station_id}/{data_group}/from/{t_from}/to/{t_to}"
+        return self.post(route, data)
+
+    def get_camera(self, station_id):
+        """Read station information"""
+        route = f"/camera/{station_id}/photos/info"
+        return self.get(route)
+
+    def get_camera_photos_last(self, station_id, amount, camera):
+        """Last amount of pictures"""
+        route = f"/camera/{station_id}/photos/last/{amount}/{camera}"
+        return self.get(route)
+
+    def get_camera_photos(self, station_id, t_from, t_to, camera):
+        """Retrieve pictures for specified period"""
+        t_from, t_to = clean_time(t_from, t_to)
+        route = f"/camera/{station_id}/photos/from/{t_from}/to/{t_to}/{camera}"
+        return self.get(route)
