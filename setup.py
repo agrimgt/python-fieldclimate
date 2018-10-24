@@ -14,6 +14,7 @@ setup(
     packages=["fieldclimate"],
     package_data={"": ["*.txt", "*.rst"]},
     install_requires=["aiohttp", "pycryptodome", "requests"],
+    python_requires=">=3.6",
     author="Agrimanagent, Inc.",
     author_email="pmarshall@agrimgt.com",
     description="A client for the iMetos FieldClimate API.",
