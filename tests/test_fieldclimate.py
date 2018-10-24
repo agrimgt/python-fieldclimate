@@ -35,6 +35,7 @@ class FieldClimateTestCase(TestCase):
         self.assertDictEqual(user, UNAUTHORIZED)
 
     @mock.patch.dict("os.environ", INVALID_KEYS)
+    @async_test
     async def test_unauthorized_async(self):
         async with FieldClimateClient() as client:
             user = await client.get_user()

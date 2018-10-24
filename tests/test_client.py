@@ -127,3 +127,9 @@ class HmacClientTestCase(TestCase):
         client = self.TestClient()
         with self.assertRaises(TypeError):
             client.httpbin_json()
+
+    def test_hmac_null_keys(self):
+        # force keys to be null in init.
+        client = self.TestClient(public_key=None, private_key=None)
+        with self.assertRaises(TypeError):
+            client.httpbin_json()
