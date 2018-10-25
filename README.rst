@@ -16,9 +16,11 @@ Requires Python 3.6. Uses aiohttp_, requests_, and pycryptodome_ libraries.
 Installation
 ------------
 
-We're not yet on PyPI, but you can use pip to install directly from github::
+Use ``pip`` to install directly from PyPI_::
 
-  pip install git+https://github.com/agrimgt/python-fieldclimate
+  pip install python-fieldclimate
+
+.. _PyPI: https://pypi.org/project/python-fieldclimate/
 
 
 Authentication

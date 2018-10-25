@@ -1,7 +1,7 @@
 """A client for the iMetos FieldClimate API."""
 
 __all__ = ["FieldClimateClient"]
-__version__ = "0.1dev"
+__version__ = "1.0"
 __author__ = "Agrimanagement, Inc."
 
 from fieldclimate.client import HmacClient
