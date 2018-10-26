@@ -58,7 +58,7 @@ This code ran in 12.9 seconds:
 ...     stations = client.get_user_stations()
 ...     print(len(stations))
 ...     for station in stations[:10]:
-...         print(client.get_data_range(station['name']['original']))
+...         print(client.get_data_range(station))
 ...
 {'username': '...', }
 1337
@@ -88,14 +88,14 @@ This code runs in 3.9 seconds:
 >>> async def print_user_json(client):
 ...     print(await client.get_user())
 ...
->>> async def print_station_dates(client, station_id):
-...     print(await client.get_data_range(station_id))
+>>> async def print_station_dates(client, station):
+...     print(await client.get_data_range(station))
 ...
 >>> async def count_stations_then_print_dates(client):
 ...     stations = await client.get_user_stations()
 ...     print(len(stations))
 ...     await asyncio.gather(*[
-...         print_station_dates(client, station['name']['original'])
+...         print_station_dates(client, station)
 ...         for station in stations[:10]
 ...     ])
 ...
@@ -145,17 +145,20 @@ However, the underlying logic and utilities they use are all tested.
 
 Every method returns a dictionary response.
 
-Many methods require a ``station_id`` argument, like ``get_data_range()`` does in the examples above.
-That ID corresponds to the nested station dictionary item ``station['name']['original']``.
+Some methods will clean up their arguments in order to make working with the api in python easier.
+Here are some examples:
 
-Some method parameters accept multiple representations of data.
-For example, ``get_data_last()`` accepts the ``time_period`` parameter.
-The API docs specify this to be a string like ``'6h'`` or ``'7d'``, meaning 6 hours or 7 days.
-FieldClimateClient additionally accepts timedelta objects for this parameter,
-and will convert them to their equivalent strings for the API
-(i.e. ``timedelta(hours=6)`` is converted to ``'21600'`` seconds).
+- ``get_data_last()`` accepts the ``time_period`` parameter.
+  The API docs specify this to be a string like ``'6h'`` or ``'7d'``, meaning 6 hours or 7 days.
+  FieldClimateClient additionally accepts timedelta objects for this parameter,
+  and will convert them to their equivalent strings for the API
+  (i.e. ``timedelta(hours=6)`` is converted to ``'21600'`` seconds).
 
-More method parameter cleaners can be found in ``fieldclimate/utils.py``.
+- Many methods require a ``station`` parameter, like ``get_data_range()`` does in the examples above.
+  This can be a raw Station ID string, which you can dig out of a station dictionary returned by ``get_user_stations()``.
+  Or, you can pass that dictionary directly in as the station parameter, and the ID will be extracted.
+
+- More method parameter cleaners can be found in ``fieldclimate/utils.py``.
 
 
 Contributing

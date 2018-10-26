@@ -7,6 +7,7 @@ __all__ = [
     "clean_filter",
     "clean_format",
     "clean_time_period",
+    "clean_station",
 ]
 
 import math
@@ -84,3 +85,15 @@ def clean_time_period(time_period: Union[str, Real, timedelta]) -> str:
         raise AssertionError(err)
     assert time_period in [f"{X}h", f"{X}d", f"{X}w", f"{X}m", f"{X}"], err
     return time_period
+
+
+def clean_station(station: Union[str, dict]) -> str:
+    # Server expects 'station_id', an 8-digit serial code.
+    # Dicts returned by get_user_stations() store that code like this:
+    # {'name': {'original': 'STATION_ID'}, ...}
+    # So lets try and extract that ID in case we get a whole dict response.
+    try:
+        return station["name"]["original"]
+    except (TypeError, KeyError):
+        pass
+    return station

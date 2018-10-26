@@ -8,6 +8,7 @@ from fieldclimate.utils import (
     clean_filter,
     clean_format,
     clean_time_period,
+    clean_station,
 )
 
 
@@ -79,3 +80,7 @@ class MethodUtilsTestCase(TestCase):
         self.assertEqual(clean_time_period(timedelta(days=4)), "345600")
         with self.assertRaises(AssertionError):
             clean_time_period("other")
+
+    def test_clean_station(self):
+        self.assertEqual(clean_station("01234567"), "01234567")
+        self.assertEqual(clean_station({"name": {"original": "01234567"}}), "01234567")

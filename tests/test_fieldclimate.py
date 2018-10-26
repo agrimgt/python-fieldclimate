@@ -1,3 +1,4 @@
+import asyncio
 import os
 from unittest import TestCase, mock
 
@@ -50,3 +51,23 @@ class FieldClimateTestCase(TestCase):
         async with FieldClimateClient() as client:
             user = await client.get_user()
             self.assertIn("username", user)
+
+    @async_test
+    async def test_clean_station_live(self):
+        # proves usage for clean_station util.
+        async with FieldClimateClient() as client:
+            stations = await client.get_user_stations()
+            original_station = stations[0]
+            # this param can be either a station code or station dict:
+            updated_stations = await asyncio.gather(
+                client.get_station(original_station),
+                client.get_station(original_station["name"]["original"]),
+            )
+            self.assertEqual(
+                original_station["name"]["original"],
+                updated_stations[0]["name"]["original"],
+            )
+            self.assertEqual(
+                original_station["name"]["original"],
+                updated_stations[1]["name"]["original"],
+            )
