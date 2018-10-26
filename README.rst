@@ -6,10 +6,9 @@ A client for the iMetos FieldClimate API: https://api.fieldclimate.com/v1/docs/
 
 To use this, you'll need HMAC credentials provided by iMetos. See their docs for more info.
 
-Requires Python 3.6. Uses aiohttp_, requests_, and pycryptodome_ libraries.
+Requires Python 3.6. Uses aiohttp_ and pycryptodome_.
 
 .. _aiohttp: https://github.com/aio-libs/aiohttp
-.. _requests: https://github.com/requests/requests
 .. _pycryptodome: https://github.com/Legrandin/pycryptodome
 
 
@@ -60,6 +59,7 @@ This code ran in 12.9 seconds:
 ...     for station in stations[:10]:
 ...         print(client.get_data_range(station))
 ...
+>>> main()
 {'username': '...', }
 1337
 {'min_date': '2016-04-27 12:33:37', 'max_date': '2018-10-23 16:00:08'}
@@ -170,7 +170,6 @@ Pull requests are welcome. Please clean your code with black_, write tests, and 
 
 Ideas for PRs:
 
-- Drop ``requests`` in favor of using ``aiohttp`` for both async and sync interfaces.
 - Rate limiting with sane defaults.
 - Proposals for higher level interfaces, e.g. ``client.stations[i].date_range``.
 - Exhaustive mocking to achieve full FC method coverage.

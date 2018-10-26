@@ -1,7 +1,7 @@
 """A client for the iMetos FieldClimate API."""
 
 __all__ = ["FieldClimateClient"]
-__version__ = "1.1"
+__version__ = "1.2"
 __author__ = "Agrimanagement, Inc."
 
 from fieldclimate.client import HmacClient
@@ -9,8 +9,8 @@ from fieldclimate.utils import *
 
 
 class FieldClimateClient(HmacClient):
-    """Adapt the aiohttp and requests libraries to FieldClimate's API,
-    switching between them depending on synchronous/asynchronous usage.
+    """Adapt the aiohttp library to FieldClimate's API,
+    providing both synchronous and asynchronous usage.
 
     Requires HMAC public and private keys for authentication.
 

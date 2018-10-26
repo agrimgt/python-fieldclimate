@@ -3,6 +3,12 @@ Changes
 =======
 
 
+1.2 (2018-10-26)
+----------------
+
+- Dropped ``requests`` library in favor of using ``aiohttp`` for both sync and async interfaces.
+
+
 1.1 (2018-10-25)
 ----------------
 

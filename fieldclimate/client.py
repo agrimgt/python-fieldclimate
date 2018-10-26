@@ -2,17 +2,17 @@
 
 __all__ = ["BaseClient", "HmacClient"]
 
+import asyncio
 from datetime import datetime
 from os import getenv
 
 import aiohttp
-import requests
 from Crypto.Hash import HMAC, SHA256
 
 
 class BaseClient:
-    """BaseClient wraps the aiohttp and requests HTTP client libraries,
-    switching between them depending on synchronous/asynchronous usage.
+    """BaseClient wraps the aiohttp HTTP client library,
+    providing both synchronous and asynchronous usage.
 
     Provides get(), post(), put(), and delete() methods.
 
@@ -52,12 +52,6 @@ class BaseClient:
         # __exit__ should exist in pair with __enter__ but never executed
         pass  # pragma: no cover
 
-    # implementation of switching request method:
-
-    def _request_sync(self, **request_args):
-        response = requests.request(**request_args)
-        return response.json()
-
     async def _request_async(self, **request_args):
         # if self.aio_session is None or self.aio_session.closed:
         #     raise ValueError("Request called without open session.")
@@ -71,10 +65,17 @@ class BaseClient:
         headers = self.get_headers(method, route)
         request_args = {"method": method, "url": url, "headers": headers, "data": data}
 
-        if self.aio_session:
+        # implementation of switching request method:
+        if self.aio_session is not None and not self.aio_session.closed:
+            # we are wrapped by an async context manager, so return an awaitable:
             return self._request_async(**request_args)
         else:
-            return self._request_sync(**request_args)
+            # we are not asynchronous, so call our 'async with' code sequentially.
+            loop = asyncio.get_event_loop()
+            loop.run_until_complete(self.__aenter__())
+            result = loop.run_until_complete(self._request_async(**request_args))
+            loop.run_until_complete(self.__aexit__(None, None, None))
+            return result
 
     # convenience wrappers around self.request():
 
