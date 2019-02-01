@@ -104,20 +104,22 @@ class HmacClient(BaseClient):
 
     """
 
-    settings_prefix = "HMAC"
     public_key = None
     private_key = None
 
     def __init__(self, public_key=None, private_key=None, **kwargs):
-        # set keys, preferring init args over env vars over class variables.
-        self.public_key = public_key or self.find_setting("public_key")
-        self.private_key = private_key or self.find_setting("private_key")
+        # set keys, preferring init args over env vars over subclass's variables.
+        self.public_key = public_key or self.find_public_key() or self.public_key
+        self.private_key = private_key or self.find_private_key() or self.private_key
         super().__init__(**kwargs)
 
     @classmethod
-    def find_setting(cls, var):
-        VAR, var = var.upper(), var.lower()
-        return getenv(f"{cls.settings_prefix}_{VAR}", getattr(cls, var, None))
+    def find_public_key(cls):
+        return getenv("FIELDCLIMATE_PUBLIC_KEY")
+
+    @classmethod
+    def find_private_key(cls):
+        return getenv("FIELDCLIMATE_PRIVATE_KEY")
 
     def get_headers(self, method, route):
         headers = super().get_headers(method, route)

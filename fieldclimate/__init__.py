@@ -20,7 +20,6 @@ class FieldClimateClient(HmacClient):
     """
 
     base_url = "https://api.fieldclimate.com/v1"
-    settings_prefix = "FIELDCLIMATE"
 
     def get_user(self):
         """Read user information"""
