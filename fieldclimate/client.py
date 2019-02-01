@@ -44,17 +44,14 @@ class BaseClient:
         if self.aio_session is not None and not self.aio_session.closed:
             await self.aio_session.close()
 
-    # provide a hint when used with the wrong with statement:
     def __enter__(self):
-        raise TypeError("Use 'async with' instead of 'with'.")
+        raise TypeError("Hint: Use 'async with' instead of 'with'.")
 
     def __exit__(self, exc_type, exc_val, exc_tb):
-        # __exit__ should exist in pair with __enter__ but never executed
+        # __exit__ should exist in pair with __enter__, but will never execute.
         pass  # pragma: no cover
 
     async def _request_async(self, **request_args):
-        # if self.aio_session is None or self.aio_session.closed:
-        #     raise ValueError("Request called without open session.")
         async with self.aio_session.request(**request_args) as response:
             return await response.json()
 
