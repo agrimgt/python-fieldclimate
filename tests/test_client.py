@@ -85,7 +85,6 @@ class BaseClientTestCase(TestCase):
 class HmacClientTestCase(TestCase):
     class TestClient(HmacClient):
         base_url = "https://httpbin.org"
-        settings_prefix = "TEST"
         public_key = None
         private_key = None
 
@@ -111,26 +110,21 @@ class HmacClientTestCase(TestCase):
         self.assertEqual(client.private_key, "secret")
 
     @mock.patch.dict(
-        "os.environ", {"TEST_PUBLIC_KEY": "super", "TEST_PRIVATE_KEY": "secret"}
+        "os.environ",
+        {"FIELDCLIMATE_PUBLIC_KEY": "super", "FIELDCLIMATE_PRIVATE_KEY": "secret"},
     )
     def test_hmac_env_keys(self):
-        # mock-set keys in environment
+        # keys are now mock-set in environment
         client = self.TestClient()
         _ = client.httpbin_json()
         self.assertEqual(client.public_key, "super")
         self.assertEqual(client.private_key, "secret")
 
     @mock.patch("os.environ")
-    def test_hmac_env_null(self, environ):
-        _ = environ.pop("TEST_PUBLIC_KEY", None)
-        _ = environ.pop("TEST_PRIVATE_KEY", None)
-        # mock-removed keys from environment
+    def test_hmac_null_keys(self, environ):
+        _ = environ.pop("FIELDCLIMATE_PUBLIC_KEY", None)
+        _ = environ.pop("FIELDCLIMATE_PRIVATE_KEY", None)
+        # keys are now mock-removed from environment
         client = self.TestClient()
-        with self.assertRaises(TypeError):
-            client.httpbin_json()
-
-    def test_hmac_null_keys(self):
-        # force keys to be null in init.
-        client = self.TestClient(public_key=None, private_key=None)
         with self.assertRaises(TypeError):
             client.httpbin_json()
