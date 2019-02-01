@@ -1,14 +1,14 @@
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, timedelta, timezone
 from unittest import TestCase
 
 from fieldclimate.utils import (
-    clean_time,
     clean_data_group,
-    clean_sort,
     clean_filter,
     clean_format,
-    clean_time_period,
+    clean_sort,
     clean_station,
+    clean_time,
+    clean_time_period,
 )
 
 

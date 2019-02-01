@@ -2,6 +2,7 @@ from datetime import datetime
 from unittest import TestCase, mock
 
 from fieldclimate.client import BaseClient, HmacClient
+
 from tests.utils import async_test
 
 

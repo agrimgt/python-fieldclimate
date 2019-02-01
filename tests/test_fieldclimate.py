@@ -3,6 +3,7 @@ import os
 from unittest import TestCase, mock
 
 from fieldclimate import FieldClimateClient
+
 from tests.utils import async_test
 
 INVALID_KEYS = {

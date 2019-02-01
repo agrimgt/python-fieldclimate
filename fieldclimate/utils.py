@@ -11,8 +11,7 @@ __all__ = [
 ]
 
 import math
-
-from datetime import datetime, timezone, timedelta
+from datetime import datetime, timedelta, timezone
 from numbers import Real
 from typing import Union
 
