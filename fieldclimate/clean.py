@@ -1,14 +1,7 @@
-"""Functions for accepting python data types when formatting API method urls."""
+"""Clean functions validate arguments and transform them into strings
+that the API server expects. Will raise AssertionError if invalid."""
 
-__all__ = [
-    "clean_time",
-    "clean_data_group",
-    "clean_sort",
-    "clean_filter",
-    "clean_format",
-    "clean_time_period",
-    "clean_station",
-]
+__all__ = ["time", "data_group", "sort", "filter", "format", "time_period", "station"]
 
 import math
 from datetime import datetime, timedelta, timezone
@@ -16,7 +9,7 @@ from numbers import Real
 from typing import Union
 
 
-def clean_time(*times: Union[str, int, datetime]) -> str:
+def time(*times: Union[str, int, datetime]) -> str:
     # Server expects t_from and t_to params as unix timestamps since UTC.
     for time in times:
         # I also want to support datetime objects, but timezones make this tricky!
@@ -28,7 +21,7 @@ def clean_time(*times: Union[str, int, datetime]) -> str:
         yield str(int(time))
 
 
-def clean_data_group(group) -> str:
+def data_group(group: Union[str, int]) -> str:
     # Server expects data_group to be one of these strings:
     valid_groups = ["raw", "hourly", "daily", "monthly"]
     try:
@@ -36,17 +29,19 @@ def clean_data_group(group) -> str:
         group = valid_groups[int(group)]
     except (IndexError, ValueError, TypeError):
         pass
-    assert group in valid_groups, f"data_group argument must be in {valid_groups}"
+    if group not in valid_groups:
+        raise AssertionError(f"data_group argument must be in {valid_groups}")
     return group
 
 
-def clean_sort(sort) -> str:
+def sort(sort: str) -> str:
     valid_sorts = ["asc", "desc"]
-    assert sort in valid_sorts, f"sort argument must be in {valid_sorts}"
+    if sort not in valid_sorts:
+        raise AssertionError(f"sort argument must be in {valid_sorts}")
     return sort
 
 
-def clean_filter(filter: str) -> str:
+def filter(filter: str) -> str:
     valid_filters = [
         "unknown",
         "success",
@@ -57,17 +52,19 @@ def clean_filter(filter: str) -> str:
         "fw_update",
         "apn_update",
     ]
-    assert filter in valid_filters, f"filter argument must be in {valid_filters}"
+    if filter not in valid_filters:
+        raise AssertionError(f"filter argument must be in {valid_filters}")
     return filter
 
 
-def clean_format(format: str) -> str:
+def format(format: str) -> str:
     valid_formats = ["normal", "optimized"]
-    assert format in valid_formats, f"format argument must be in {valid_formats}"
+    if format not in valid_formats:
+        raise AssertionError(f"format argument must be in {valid_formats}")
     return format
 
 
-def clean_time_period(time_period: Union[str, Real, timedelta]) -> str:
+def time_period(time_period: Union[str, Real, timedelta]) -> str:
     # Server expects a string like Xh, Xd, Xw, Xm, X, where:
     # X = Number, h = hours, d = days, w = weeks, m = months
     # X alone must mean total seconds
@@ -82,15 +79,16 @@ def clean_time_period(time_period: Union[str, Real, timedelta]) -> str:
         X = int(time_period.rstrip("hdwm"))
     except ValueError:
         raise AssertionError(err)
-    assert time_period in [f"{X}h", f"{X}d", f"{X}w", f"{X}m", f"{X}"], err
+    if time_period not in [f"{X}h", f"{X}d", f"{X}w", f"{X}m", f"{X}"]:
+        raise AssertionError(err)
     return time_period
 
 
-def clean_station(station: Union[str, dict]) -> str:
+def station(station: Union[str, dict]) -> str:
     # Server expects 'station_id', an 8-digit serial code.
     # Dicts returned by get_user_stations() store that code like this:
     # {'name': {'original': 'STATION_ID'}, ...}
-    # So lets try and extract that ID in case we get a whole dict response.
+    # So lets try and extract that ID in case station is a dict.
     try:
         return station["name"]["original"]
     except (TypeError, KeyError):

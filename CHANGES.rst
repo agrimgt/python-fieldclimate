@@ -3,6 +3,13 @@ Changes
 =======
 
 
+Unreleased
+----------
+
+- Moved url validation functions from ``fieldclimate.utils`` to ``fieldclimate.clean``.
+  These functions now ``raise AssertionError()`` rather than using ``assert``, which gets compiled out in production.
+
+
 1.2 (2018-10-26)
 ----------------
 
