@@ -2,7 +2,6 @@ from setuptools import setup
 
 import fieldclimate
 
-
 setup(
     name="python-fieldclimate",
     version=fieldclimate.__version__,

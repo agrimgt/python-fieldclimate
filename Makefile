@@ -3,9 +3,10 @@
 
 modules = \
 	fieldclimate \
+	setup.py \
 	tests \
 	${more}
 
 clean:
 	isort -rc -m 3 -w 88 -tc $(modules)
-	black --py36 --skip-numeric-underscore-normalization $(modules)
+	black $(modules)
