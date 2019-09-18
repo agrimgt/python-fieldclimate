@@ -37,7 +37,7 @@ This is thanks to asks being written with anyio_, which currently supports async
 Authentication
 ~~~~~~~~~~~~~~
 
-HMAC credentials can be provided in three ways:
+HMAC credentials can be provided in several ways:
 
 1. Via the init constructor:
 
@@ -50,6 +50,9 @@ HMAC credentials can be provided in three ways:
    >>> class MyClient(FieldClimateClient):
    ...     private_key = 'YOUR'
    ...     public_key = 'KEYS'
+
+4. If you use Django, you can use ``fieldclimate.django.DjangoFieldClimateClient`` in place of FieldClimateClient.
+   This subclass will grab ``FIELDCLIMATE_PUBLIC_KEY`` and ``FIELDCLIMATE_PRIVATE_KEY`` from django's settings.
 
 
 Methods

@@ -17,7 +17,7 @@ Unreleased
 - Dropped synchronous method interface, meaning all client methods must now be awaited.
 - Rewrote README.rst with new changes.
 - Added tests for trio and curio event loops.
-- TODO: Add DjangoFieldClimateClient
+- Added DjangoFieldClimateClient.
 
 
 1.2 (2018-10-26)
