@@ -18,7 +18,7 @@ UNAUTHORIZED = {
 
 
 class FieldClimateTestCase(TestCase):
-    """Testing FieldClimateClient requires valid HMAC keys to be set via
+    """Testing FieldClimateTestCase requires valid HMAC keys to be set via
     the FIELDCLIMATE_PUBLIC_KEY and FIELDCLIMATE_PRIVATE_KEY variables.
 
     For now, tests are limited to viewing the user profile. It would be

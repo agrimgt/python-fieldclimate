@@ -159,6 +159,9 @@ Advanced Example:
        run(main())
 
 
+Alternate implementations of these examples using curio and trio are the ``tests`` directory.
+
+
 Synchronous Usage Removed
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 

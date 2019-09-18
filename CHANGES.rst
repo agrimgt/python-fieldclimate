@@ -16,7 +16,7 @@ Unreleased
 - Removed BaseClient and HmacClient classes, unifying their functionality in FieldClimateClient.
 - Dropped synchronous method interface, meaning all client methods must now be awaited.
 - Rewrote README.rst with new changes.
-- TODO: Add tests for trio and curio event loops.
+- Added tests for trio and curio event loops.
 - TODO: Add DjangoFieldClimateClient
 
 
