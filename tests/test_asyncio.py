@@ -13,7 +13,7 @@ class AsyncioTestCase(TestCase):
             client = FieldClimateClient()
             return await client.get_user()
 
-        asyncio.run(main())
+        asyncio.get_event_loop().run_until_complete(main())
 
     def test_asyncio_advanced_example(self):
         async def main():
@@ -36,4 +36,4 @@ class AsyncioTestCase(TestCase):
                     print_user_json(), count_stations_then_print_ranges()
                 )
 
-        asyncio.run(main())
+        asyncio.get_event_loop().run_until_complete(main())
