@@ -31,7 +31,7 @@ setup(
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3 :: Only",
     ],
-    install_requires=["aiohttp", "pycryptodome"],
+    install_requires=["asks", "pycryptodome"],
     python_requires=">=3.6",
     include_package_data=True,
 )

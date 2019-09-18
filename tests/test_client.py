@@ -1,97 +1,80 @@
 from datetime import datetime
 from unittest import TestCase, mock
 
-from fieldclimate.client import BaseClient, HmacClient
-
+from fieldclimate import FieldClimateClient
 from tests.utils import async_test
 
 
-class BaseClientTestCase(TestCase):
-    class TestClient(BaseClient):
-        base_url = "https://httpbin.org"
+class ClientTestCase(TestCase):
+    class TestClient(FieldClimateClient):
+        base_location = "https://httpbin.org"
 
-        def httpbin_get(self):
-            return self.get("/get")
+        async def httpbin_get(self):
+            return (await self.get(path="/get")).json()
 
-        def httpbin_post(self):
-            return self.post("/post")
+        async def httpbin_post(self):
+            return (await self.post(path="/post")).json()
 
-        def httpbin_put(self):
-            return self.put("/put")
+        async def httpbin_put(self):
+            return (await self.put(path="/put")).json()
 
-        def httpbin_delete(self):
-            return self.delete("/delete")
+        async def httpbin_delete(self):
+            return (await self.delete(path="/delete")).json()
 
-        def httpbin_json(self):
-            return self.get("/json")
-
-    def test_httpbin_get_sync(self):
-        client = self.TestClient()
-        self.assertIn("args", client.httpbin_get())
-
-    def test_httpbin_post_sync(self):
-        client = self.TestClient()
-        self.assertIn("args", client.httpbin_post())
-
-    def test_httpbin_put_sync(self):
-        client = self.TestClient()
-        self.assertIn("args", client.httpbin_put())
-
-    def test_httpbin_delete_sync(self):
-        client = self.TestClient()
-        self.assertIn("args", client.httpbin_delete())
-
-    def test_httpbin_json_sync(self):
-        client = self.TestClient()
-        self.assertIn("slideshow", client.httpbin_json())
+        async def httpbin_json(self):
+            return (await self.get(path="/json")).json()
 
     @async_test
-    async def test_httpbin_get_async(self):
+    async def test_httpbin_get(self):
+        client = self.TestClient()
+        self.assertIn("args", await client.httpbin_get())
+
+    @async_test
+    async def test_httpbin_post(self):
+        client = self.TestClient()
+        self.assertIn("args", await client.httpbin_post())
+
+    @async_test
+    async def test_httpbin_put(self):
+        client = self.TestClient()
+        self.assertIn("args", await client.httpbin_put())
+
+    @async_test
+    async def test_httpbin_delete(self):
+        client = self.TestClient()
+        self.assertIn("args", await client.httpbin_delete())
+
+    @async_test
+    async def test_httpbin_json(self):
+        client = self.TestClient()
+        self.assertIn("slideshow", await client.httpbin_json())
+
+    @async_test
+    async def test_httpbin_get_async_with(self):
         async with self.TestClient() as client:
             self.assertIn("args", await client.httpbin_get())
 
     @async_test
-    async def test_httpbin_post_async(self):
+    async def test_httpbin_post_async_with(self):
         async with self.TestClient() as client:
             self.assertIn("args", await client.httpbin_post())
 
     @async_test
-    async def test_httpbin_put_async(self):
+    async def test_httpbin_put_async_with(self):
         async with self.TestClient() as client:
             self.assertIn("args", await client.httpbin_put())
 
     @async_test
-    async def test_httpbin_delete_async(self):
+    async def test_httpbin_delete_async_with(self):
         async with self.TestClient() as client:
             self.assertIn("args", await client.httpbin_delete())
 
     @async_test
-    async def test_httpbin_json_async(self):
+    async def test_httpbin_json_async_with(self):
         async with self.TestClient() as client:
             self.assertIn("slideshow", await client.httpbin_json())
 
-    def test_incorrect_with(self):
-        with self.assertRaises(TypeError):
-            with self.TestClient() as client:
-                pass  # pragma: no cover
-
-    def test_no_base_url(self):
-        client = self.TestClient()
-        client.base_url = None
-        with self.assertRaises(TypeError):
-            client.httpbin_json()
-
-
-class HmacClientTestCase(TestCase):
-    class TestClient(HmacClient):
-        base_url = "https://httpbin.org"
-        public_key = None
-        private_key = None
-
-        def httpbin_json(self):
-            return self.get("/json")
-
-    @mock.patch("fieldclimate.client.datetime")
+    @mock.patch("fieldclimate.datetime")
     def test_hmac_headers(self, mock_datetime):
         mock_datetime.utcnow = mock.Mock(
             return_value=datetime(2018, 10, 22, 22, 22, 22, 222222)
@@ -113,18 +96,19 @@ class HmacClientTestCase(TestCase):
         "os.environ",
         {"FIELDCLIMATE_PUBLIC_KEY": "super", "FIELDCLIMATE_PRIVATE_KEY": "secret"},
     )
-    def test_hmac_env_keys(self):
+    @async_test
+    async def test_hmac_env_keys(self):
         # keys are now mock-set in environment
         client = self.TestClient()
-        _ = client.httpbin_json()
         self.assertEqual(client.public_key, "super")
         self.assertEqual(client.private_key, "secret")
 
     @mock.patch("os.environ")
-    def test_hmac_null_keys(self, environ):
+    @async_test
+    async def test_hmac_null_keys(self, environ):
         _ = environ.pop("FIELDCLIMATE_PUBLIC_KEY", None)
         _ = environ.pop("FIELDCLIMATE_PRIVATE_KEY", None)
         # keys are now mock-removed from environment
         client = self.TestClient()
         with self.assertRaises(TypeError):
-            client.httpbin_json()
+            await client.httpbin_json()

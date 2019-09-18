@@ -6,9 +6,9 @@ A client for the iMetos FieldClimate API: https://api.fieldclimate.com/v1/docs/
 
 To use this, you'll need HMAC credentials provided by iMetos. See their docs for more info.
 
-Requires Python 3.6. Uses aiohttp_ and pycryptodome_.
+Requires Python 3.6. Depends on asks_ and pycryptodome_.
 
-.. _aiohttp: https://github.com/aio-libs/aiohttp
+.. _asks: https://github.com/theelous3/asks
 .. _pycryptodome: https://github.com/Legrandin/pycryptodome
 
 
@@ -22,8 +22,20 @@ Use ``pip`` to install directly from PyPI_::
 .. _PyPI: https://pypi.org/project/python-fieldclimate/
 
 
+Usage
+-----
+
+The same FieldClimateClient class can be used to make asynchronous requests under any modern event loop.
+This is thanks to asks being written with anyio_, which currently supports asyncio_, curio_, and trio_.
+
+.. _anyio: https://github.com/agronholm/anyio
+.. _asyncio: https://docs.python.org/3/library/asyncio.html
+.. _curio: https://github.com/dabeaz/curio
+.. _trio: https://github.com/python-trio/trio
+
+
 Authentication
---------------
+~~~~~~~~~~~~~~
 
 HMAC credentials can be provided in three ways:
 
@@ -31,8 +43,7 @@ HMAC credentials can be provided in three ways:
 
    >>> FieldClimateClient(public_key='YOUR', private_key='KEYS')
 
-2. Environment variables ``FIELDCLIMATE_PUBLIC_KEY`` and ``FIELDCLIMATE_PRIVATE_KEY``
-   (You can override these variable names too).
+2. Environment variables ``FIELDCLIMATE_PUBLIC_KEY`` and ``FIELDCLIMATE_PRIVATE_KEY``.
 
 3. Subclassing FieldClimateClient:
 
@@ -41,52 +52,14 @@ HMAC credentials can be provided in three ways:
    ...     public_key = 'KEYS'
 
 
-Usage
------
-
-The same FieldClimateClient class can be used to make synchronous and asynchronous requests.
-This way, the code you write can be free of async/await syntax until you decide you need it.
-
-Here are some short examples to get you up and running. There are longer examples in `When to Use Async`_.
-
-Synchronous Usage:
-
->>> from fieldclimate import FieldClimateClient
->>>
->>> client = FieldClimateClient(private_key='YOUR', public_key='KEYS')
->>> client.get_user()
-{'username': 'you!', ...}
-
-
-Asynchronous Usage:
-
->>> from asyncio import run
->>> from fieldclimate import FieldClimateClient
->>>
->>> async def main():
->>>     async with FieldClimateClient(private_key='YOUR', public_key='KEYS') as client:
->>>         return await client.get_user()
->>>
->>> run(main)
-{'username': 'also you!', ...}
-
-
-It achieves this by calling running an asyncio loop internally if it finds itself under an asynchronous context manager.
-In other words, if you *don't* use the client in an `async with` block, you don't have to await the client methods.
-
-
 Methods
 ~~~~~~~
 
 The client has methods for each of the corresponding routes listed in the api docs.
 There's a lot of them, so see the full list of methods in ``fieldclimate/__init__.py`` for more details.
+Every method returns a dictionary response upon being awaited.
 
-These methods do not have test coverage (and some, like ``delete_user()``, could be dangerous!).
-However, the underlying logic and utilities they use are all tested.
-
-Every method returns a dictionary response.
-
-Some methods will clean up their arguments in order to make working with the api in python easier.
+Some methods will clean up their arguments in order to make working with the API in python easier.
 Here are some examples:
 
 - ``get_data_last()`` accepts the ``time_period`` parameter.
@@ -99,64 +72,70 @@ Here are some examples:
   This can be a raw Station ID string, which you can dig out of a station dictionary returned by ``get_user_stations()``.
   Or, you can pass that dictionary directly in as the station parameter, and the ID will be extracted.
 
-- More method parameter cleaners can be found in ``fieldclimate/utils.py``.
+These methods do not all have test coverage (testing ``delete_user()`` might be a bad idea).
+However, the underlying connection and cleaning utilities they use are all tested.
 
 
-When to Use Async
+Connection Limits
 ~~~~~~~~~~~~~~~~~
 
-Synchronous code is easier to read, but Python can potentially spend more time waiting when running it.
+The connection limit can be raised by setting the connections argument when calling the FieldClimateClient constructor.
 
-This script finishes in 12.9 seconds:
+From `asks' docs`_:
 
-.. code-block:: python
+    You *will* want to change the number of connections to a value that suits your needs and the server’s limitations.
+    If no data is publicly available to guide you here, err on the low side.
 
-   from fieldclimate import FieldClimateClient
+    **The default number of connections in the pool for a Session is a measly ONE.**
 
-   def main():
-       client = FieldClimateClient()
-       # print user json
-       print(client.get_user())
-       # count stations
-       stations = client.get_user_stations()
-       print(len(stations))
-       # print ranges
-       for station in stations[:10]:
-           print(client.get_data_range(station))
+.. _asks' docs: https://asks.readthedocs.io/en/latest/a-look-at-sessions.html#important-connection-un-limiting
 
-   if __name__ == '__main__':
-       main()
-
-output:
-
->>> main()
-{'username': '...', }
-1337
-{'min_date': '2016-04-27 12:33:37', 'max_date': '2018-10-23 16:00:08'}
-{'min_date': '2016-05-05 10:00:13', 'max_date': '2018-10-09 23:00:04'}
-{'min_date': '2016-04-27 12:54:09', 'max_date': '2018-09-18 12:14:50'}
-{'min_date': '2016-04-27 12:43:29', 'max_date': '2018-09-23 11:00:03'}
-{'min_date': '2016-03-24 01:16:40', 'max_date': '2018-10-23 15:55:09'}
-{'min_date': '2016-04-27 11:52:15', 'max_date': '2018-10-19 15:00:08'}
-{'min_date': '2016-04-28 04:02:11', 'max_date': '2018-10-23 16:00:08'}
-{'min_date': '2015-11-16 01:05:32', 'max_date': '2018-10-23 16:00:08'}
-{'min_date': '2016-04-27 11:34:52', 'max_date': '2018-10-11 20:00:03'}
-{'min_date': '2016-06-01 19:00:27', 'max_date': '2018-09-06 16:00:38'}
-
-
-Asynchronous mode works by using the client as an async context manager.
-Async code is more complicated, but allows a lot of work to be done at once.
-
-This script finishes in 3.9 seconds:
+Example:
 
 .. code-block:: python
 
-   import asyncio
+   async with FieldClimateClient(connections=10) as client:
+       ...
+
+
+According to FieldClimate's docs, they do not yet enforce rate limiting server-side.
+Using FieldClimateClient with a high connection limit allows you to create *a lot* of requests at once.
+During my testing, I noticed the API starting to raise 502 errors when I overloaded it too much.
+
+Please be courteous with your resource consumption!
+
+
+Examples
+~~~~~~~~
+
+Simple Example:
+
+.. code-block:: python
+
+   from asyncio import run
    from fieldclimate import FieldClimateClient
 
    async def main():
-       async with FieldClimateClient() as client:
+       client = FieldClimateClient(private_key="YOUR", public_key="KEYS")
+       return await client.get_user()
 
+   if __name__ == "__main__":
+       run(main)
+
+
+Advanced Example:
+
+.. code-block:: python
+
+   from asyncio import gather, run
+   from fieldclimate import FieldClimateClient
+
+   async def main():
+       async with FieldClimateClient(
+           private_key="YOUR",
+           public_key="KEYS",
+           connections=20
+       ) as client:
            async def print_user_json():
                print(await client.get_user())
 
@@ -166,48 +145,60 @@ This script finishes in 3.9 seconds:
            async def count_stations_then_print_ranges():
                stations = await client.get_user_stations()
                print(len(stations))
-               await asyncio.gather(*[
+               await gather(*[
                    print_station_dates(station)
                    for station in stations[:10]
                ])
 
-           await asyncio.gather(
+           await gather(
                print_user_json(),
                count_stations_then_print_ranges(),
            )
 
-   if __name__ == '__main__':
-       asyncio.run(main())
-
-output:
-
->>> asyncio.run(main())
-{'username': '...', }
-1337
-{'min_date': '2016-04-27 11:52:15', 'max_date': '2018-10-19 15:00:08'}
-{'min_date': '2016-04-27 12:54:09', 'max_date': '2018-09-18 12:14:50'}
-{'min_date': '2015-11-16 01:05:32', 'max_date': '2018-10-23 16:00:08'}
-{'min_date': '2016-04-27 12:43:29', 'max_date': '2018-09-23 11:00:03'}
-{'min_date': '2016-04-27 12:33:37', 'max_date': '2018-10-23 16:00:08'}
-{'min_date': '2016-06-01 19:00:27', 'max_date': '2018-09-06 16:00:38'}
-{'min_date': '2016-04-28 04:02:11', 'max_date': '2018-10-23 16:00:08'}
-{'min_date': '2016-03-24 01:16:40', 'max_date': '2018-10-23 15:55:09'}
-{'min_date': '2016-05-05 10:00:13', 'max_date': '2018-10-09 23:00:04'}
-{'min_date': '2016-04-27 11:34:52', 'max_date': '2018-10-11 20:00:03'}
-
-Notice how the ordering of the dates is different than before.
-They are now sorted from the fastest server response to the slowest.
-Theoretically, the `{'username':}` line could be printed last.
+   if __name__ == "__main__":
+       run(main())
 
 
-A note on rate limits
-~~~~~~~~~~~~~~~~~~~~~
+Synchronous Usage Removed
+~~~~~~~~~~~~~~~~~~~~~~~~~
 
-According to FieldClimate's docs, they do not yet enforce rate limiting server-side.
-Using python-fieldclimate asynchronously allows you to create hundreds or thousands of requests at once.
-During my testing I noticed the API starting to raise 502 errors when I overloaded it too much.
+Previous to version 2.0, FieldClimateClient would automatically set up an asyncio event loop when methods were
+being called outside of an ``async with`` block.
+This way, callers could use the library without having to write any scary async/await code.
 
-Please be courteous with your resource consumption!
+Having this mix of syntax ended up being confusing and unnecessary, in addition to leading to messy code here.
+So, with the switch to the ``asks`` backend, support for the old synchronous use case was removed.
+
+If you were using FieldClimateClient's older 'synchronous usage' mode, you were already using a version of Python that
+allowed for async/await. The difference is that now you have to set up an event loop yourself.
+
+If you still *really* don't want to write any coroutines, the simplest way to make your code compatible with version 2
+is to just wrap each method call with ``asyncio.run()``:
+
+.. code-block:: python
+
+   import asyncio
+   from fieldclimate import FieldClimateClient
+
+   def main():
+       client = FieldClimateClient(private_key="YOUR", public_key="KEYS")
+       # print user json
+       print(asyncio.run(client.get_user()))
+       # count stations
+       stations = asyncio.run(client.get_user_stations())
+       print(len(stations))
+       # print ranges
+       for station in stations[:10]:
+           print(asyncio.run(client.get_data_range(station)))
+
+   if __name__ == "__main__":
+       main()
+
+
+This 'synchronous' example takes 3 times longer to complete than the equivalent "Advanced Example" above, because the
+main() function is blocked during each request sent to the server.
+The asynchronous code, on the other hand, only blocks when there's nothing to do *but* wait for the server.
+Consider this when deciding whether or not to convert your code to use coroutine functions.
 
 
 Contributing
@@ -216,10 +207,3 @@ Contributing
 Pull requests are welcome. Please clean your code with black_, write tests, and document.
 
 .. _black: https://github.com/ambv/black
-
-Ideas for PRs:
-
-- Rate limiting with sane defaults.
-- Proposals for higher level interfaces, e.g. ``client.stations[i].date_range``.
-- Exhaustive mocking to achieve full FC method coverage.
-- More parameter-cleaning utils.

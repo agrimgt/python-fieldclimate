@@ -7,7 +7,17 @@ Unreleased
 ----------
 
 - Moved url validation functions from ``fieldclimate.utils`` to ``fieldclimate.clean``.
-  These functions now ``raise AssertionError()`` rather than using ``assert``, which gets compiled out in production.
+  These functions now ``raise AssertionError()`` explicitly.
+  Before, ``assert``s were compiled out during production.
+- Dropped ``aiohttp`` dependency in favor of ``asks``.
+- This means python-fieldclimate now supports asyncio, trio, and curio async loops!
+- FieldClimateClient now inherits from ``asks.Session``,
+  which provides async context manager usage and connection rate limiting.
+- Removed BaseClient and HmacClient classes, unifying their functionality in FieldClimateClient.
+- Dropped synchronous method interface, meaning all client methods must now be awaited.
+- Rewrote README.rst with new changes.
+- TODO: Add tests for trio and curio event loops.
+- TODO: Add DjangoFieldClimateClient
 
 
 1.2 (2018-10-26)

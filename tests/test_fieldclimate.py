@@ -3,7 +3,6 @@ import os
 from unittest import TestCase, mock
 
 from fieldclimate import FieldClimateClient
-
 from tests.utils import async_test
 
 INVALID_KEYS = {
@@ -32,23 +31,25 @@ class FieldClimateTestCase(TestCase):
         self.assertIn("FIELDCLIMATE_PRIVATE_KEY", os.environ)
 
     @mock.patch.dict("os.environ", INVALID_KEYS)
-    def test_unauthorized(self):
-        user = FieldClimateClient().get_user()
+    @async_test
+    async def test_unauthorized(self):
+        user = await FieldClimateClient().get_user()
         self.assertDictEqual(user, UNAUTHORIZED)
 
     @mock.patch.dict("os.environ", INVALID_KEYS)
     @async_test
-    async def test_unauthorized_async(self):
+    async def test_unauthorized_async_with(self):
         async with FieldClimateClient() as client:
             user = await client.get_user()
             self.assertDictEqual(user, UNAUTHORIZED)
 
-    def test_get_user_sync(self):
-        user = FieldClimateClient().get_user()
+    @async_test
+    async def test_get_user(self):
+        user = await FieldClimateClient().get_user()
         self.assertIn("username", user)
 
     @async_test
-    async def test_get_user_async(self):
+    async def test_get_user_async_with(self):
         async with FieldClimateClient() as client:
             user = await client.get_user()
             self.assertIn("username", user)

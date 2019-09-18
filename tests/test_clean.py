@@ -4,7 +4,7 @@ from unittest import TestCase
 from fieldclimate import clean
 
 
-class MethodUtilsTestCase(TestCase):
+class CleanTestCase(TestCase):
     def test_clean_time(self):
         tz = timezone(timedelta(hours=5))  # (5 hours east of utc)
         a, b, c, d = clean.time(
