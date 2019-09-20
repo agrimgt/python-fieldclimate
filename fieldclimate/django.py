@@ -26,11 +26,11 @@ class DjangoFieldClimateClient(FieldClimateClient):
         try:
             return settings.FIELDCLIMATE_PUBLIC_KEY
         except AttributeError:
-            raise ImproperlyConfigured(err)
+            raise ImproperlyConfigured(f"Public key not found. {err}")
 
     @classmethod
     def find_private_key(cls):
         try:
             return settings.FIELDCLIMATE_PRIVATE_KEY
         except AttributeError:
-            raise ImproperlyConfigured(err)
+            raise ImproperlyConfigured(f"Private key not found. {err}")
