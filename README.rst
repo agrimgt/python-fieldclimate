@@ -25,6 +25,11 @@ To try out unreleased changes (see CHANGES.rst!), install from the git master br
 
   pip install -e git://github.com/agrimgt/python-fieldclimate.git#egg=fieldclimate
 
+**The rest of this readme assumes you are using the unreleased development version!**
+Things have changed a little since 1.2, so if you're using that, go read `the 1.2 readme`_.
+
+.. _the 1.2 readme: https://github.com/agrimgt/python-fieldclimate/blob/1.2/README.rst
+
 
 Usage
 -----
