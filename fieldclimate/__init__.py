@@ -1,7 +1,7 @@
 """An asynchronous client for the iMetos FieldClimate API."""
 
 __all__ = ["FieldClimateClient"]
-__version__ = "2.0"
+__version__ = "1.2"
 __author__ = "Agrimanagement, Inc."
 
 from datetime import datetime
