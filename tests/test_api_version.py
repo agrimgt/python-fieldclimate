@@ -3,6 +3,10 @@ from unittest import TestCase
 
 import asks
 
+# TODO: This test is broken!
+#  https://api.fieldclimate.com/v2/docs/ has been released but
+#  https://api.fieldclimate.com/versions.json has not been updated.
+
 
 async def fetch_versions():
     url = "https://api.fieldclimate.com/versions.json"
