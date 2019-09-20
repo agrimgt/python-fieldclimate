@@ -189,7 +189,7 @@ So, with the switch to the ``asks`` backend, support for the old synchronous use
 If you were using FieldClimateClient's older 'synchronous usage' mode, you were already using a version of Python that
 allowed for async/await. The difference is that now you have to set up an event loop yourself.
 
-If you still *really* don't want to write any coroutines, the simplest way to make your code compatible with version 2
+If you still *really* don't want to write any coroutines, the simplest way to make your code compatible with dev version
 is to just wrap each method call with ``asyncio.run()``:
 
 .. code-block:: python
