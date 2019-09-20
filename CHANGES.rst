@@ -26,6 +26,8 @@ Unreleased
 - Rewrote README.rst with new changes.
 - Added tests for trio and curio event loops.
 - Added DjangoFieldClimateClient.
+  This subclass gets your HMAC authentication keys from django's settings,
+  which can save you a few lines of code if you already use django.
 
 
 1.2 (2018-10-26)

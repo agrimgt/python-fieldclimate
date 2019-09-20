@@ -12,6 +12,15 @@ err = (
 class DjangoFieldClimateClient(FieldClimateClient):
     """Get HMAC keys from Django project's settings, or raise an error."""
 
+    def __init__(self, **kwargs):
+        # Deny usage of public_key and private_key kwargs.
+        if "public_key" in kwargs or "private_key" in kwargs:
+            client = self.__class__.__name__
+            raise ImproperlyConfigured(
+                f"{client} does not accept HMAC keys via init kwargs. {err}"
+            )
+        super(DjangoFieldClimateClient, self).__init__(**kwargs)
+
     @classmethod
     def find_public_key(cls):
         try:

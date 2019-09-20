@@ -31,3 +31,13 @@ class DjangoTestCase(TestCase):
             del settings.FIELDCLIMATE_PRIVATE_KEY
             with self.assertRaises(ImproperlyConfigured):
                 DjangoFieldClimateClient()
+
+    @async_test
+    async def test_deny_init_public_key(self):
+        with self.assertRaises(ImproperlyConfigured):
+            DjangoFieldClimateClient(public_key="DJANGO")
+
+    @async_test
+    async def test_deny_init_private_key(self):
+        with self.assertRaises(ImproperlyConfigured):
+            DjangoFieldClimateClient(private_key="DANGO")
