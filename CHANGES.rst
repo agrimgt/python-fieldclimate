@@ -6,25 +6,33 @@ Changes
 TODO
 ----
 
-- Metos has released their API v2: https://api.fieldclimate.com/v2/docs/
-- How should we best support both users of v2 and v1, which will still be supported?
-- Need to assess how different the new API is before deciding on how to tackle this.
+- Add support for Metos' API v2: https://api.fieldclimate.com/v2/docs/
+  - How should we best support both users of v2 and v1, which should still be supported?
+  - Need to assess how different the new API is before deciding on how to tackle this.
+  - Increment major version to track with upstream.
 
 
 Unreleased
 ----------
 
+High-level changes:
+
+- Dropped ``aiohttp`` library in favor of using ``asks``.
+- This adds support for asyncio, trio, and curio async loops.
+- Dropped synchronous interface on FieldClimateClient.
+  **This means all client methods must now be awaited.**
+
+Implementation changes:
+
 - Moved url validation functions from ``fieldclimate.utils`` to ``fieldclimate.clean``.
-  These functions now ``raise AssertionError()`` explicitly.
-  Before, ``assert``s were compiled out during production.
-- Dropped ``aiohttp`` dependency in favor of ``asks``.
-- This means python-fieldclimate now supports asyncio, trio, and curio async loops!
+  These functions now raise ``AssertionError`` explicitly, as ``assert`` statements can be switched off.
 - FieldClimateClient now inherits from ``asks.Session``,
   which provides async context manager usage and connection rate limiting.
 - Removed BaseClient and HmacClient classes, unifying their functionality in FieldClimateClient.
-- Dropped synchronous method interface, meaning all client methods must now be awaited.
-- Rewrote README.rst with new changes.
 - Added tests for trio and curio event loops.
+
+Bonus changes:
+
 - Added DjangoFieldClimateClient.
   This subclass gets your HMAC authentication keys from django's settings,
   which can save you a few lines of code if you already use django.
