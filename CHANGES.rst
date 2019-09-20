@@ -3,6 +3,14 @@ Changes
 =======
 
 
+TODO
+----
+
+- Metos has released their API v2: https://api.fieldclimate.com/v2/docs/
+- How should we best support both users of v2 and v1, which will still be supported?
+- Need to assess how different the new API is before deciding on how to tackle this.
+
+
 Unreleased
 ----------
 

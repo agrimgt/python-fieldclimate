@@ -15,11 +15,15 @@ Requires Python 3.6. Depends on asks_ and pycryptodome_.
 Installation
 ------------
 
-Use ``pip`` to install directly from PyPI_::
+Use ``pip`` to install the current release, version 1.2, from PyPI_::
 
   pip install python-fieldclimate
 
 .. _PyPI: https://pypi.org/project/python-fieldclimate/
+
+To try out unreleased changes (see CHANGES.rst!), install from the git master branch::
+
+  pip install -e git://github.com/agrimgt/python-fieldclimate.git#egg=fieldclimate
 
 
 Usage
@@ -168,7 +172,9 @@ Alternate implementations of these examples using curio and trio are the ``tests
 Synchronous Usage Removed
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Previous to version 2.0, FieldClimateClient would automatically set up an asyncio event loop when methods were
+**New in UNRELEASED master branch:**
+
+In version 1.2, FieldClimateClient would automatically set up an asyncio event loop when methods were
 being called outside of an ``async with`` block.
 This way, callers could use the library without having to write any scary async/await code.
 
