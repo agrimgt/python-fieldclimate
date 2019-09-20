@@ -9,20 +9,20 @@ class ClientTestCase(TestCase):
     class TestClient(FieldClimateClient):
         base_location = "https://httpbin.org"
 
-        async def httpbin_get(self):
-            return (await self.get(path="/get")).json()
+        def httpbin_get(self):
+            return self.request_json("GET", "/get")
 
-        async def httpbin_post(self):
-            return (await self.post(path="/post")).json()
+        def httpbin_post(self):
+            return self.request_json("POST", "/post")
 
-        async def httpbin_put(self):
-            return (await self.put(path="/put")).json()
+        def httpbin_put(self):
+            return self.request_json("PUT", "/put")
 
-        async def httpbin_delete(self):
-            return (await self.delete(path="/delete")).json()
+        def httpbin_delete(self):
+            return self.request_json("DELETE", "/delete")
 
-        async def httpbin_json(self):
-            return (await self.get(path="/json")).json()
+        def httpbin_json(self):
+            return self.request_json("GET", "/json")
 
     @async_test
     async def test_httpbin_get(self):
