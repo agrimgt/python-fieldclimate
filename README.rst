@@ -224,3 +224,8 @@ Contributing
 Pull requests are welcome. Please clean your code with black_, write tests, and document.
 
 .. _black: https://github.com/ambv/black
+
+Ideas for PRs:
+
+- Exhaustive mocking to achieve full method test coverage.
+- OAuth 2.0 authentication.
