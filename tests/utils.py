@@ -1,4 +1,5 @@
 import asyncio
+import sys
 from functools import partial
 
 import curio
@@ -7,7 +8,10 @@ import trio
 
 def async_test(coro):
     def wrapper(*args, **kwargs):
-        return asyncio.new_event_loop().run_until_complete(coro(*args, **kwargs))
+
+        if sys.version_info < (3, 7):
+            return asyncio.get_event_loop().run_until_complete(coro(*args, **kwargs))
+        return asyncio.run(coro(*args, **kwargs))
 
     return wrapper
 

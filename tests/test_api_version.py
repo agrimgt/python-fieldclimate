@@ -1,7 +1,8 @@
-import asyncio
 from unittest import TestCase
 
 import asks
+
+from tests.utils import async_test
 
 # TODO: This test is broken!
 #  https://api.fieldclimate.com/v2/docs/ has been released but
@@ -15,9 +16,10 @@ async def fetch_versions():
 
 
 class VersionTestCase(TestCase):
-    def test_version_up_to_date(self):
+    @async_test
+    async def test_version_up_to_date(self):
         # this test will fail when fieldclimate publishes a new api version to versions.json.
-        result = asyncio.get_event_loop().run_until_complete(fetch_versions())
+        result = await fetch_versions()
         expected = [
             {
                 "version": "1.0",
