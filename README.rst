@@ -15,26 +15,37 @@ Requires Python 3.5 or better. Tested on Python 3.6. Depends on asks_ and pycryp
 Installation
 ------------
 
-Use ``pip`` to install the current release, version 1.2, from PyPI_::
+Use ``pip`` to install the current release, version 1.3, from PyPI_::
 
   pip install python-fieldclimate
 
 .. _PyPI: https://pypi.org/project/python-fieldclimate/
 
-To try out unreleased changes (see CHANGES.rst!), install from the git master branch::
-
-  pip install -e git://github.com/agrimgt/python-fieldclimate.git#egg=fieldclimate
-
-**The rest of this readme assumes you are using the unreleased development version!**
-Things have changed a little since 1.2, so if you're using that, go read `the 1.2 readme`_.
-
-.. _the 1.2 readme: https://github.com/agrimgt/python-fieldclimate/blob/1.2/README.rst
-
 
 Usage
 -----
 
-The same FieldClimateClient class can be used to make asynchronous requests under any modern event loop.
+Here's a simple example that returns the associated user's account info:
+
+.. code-block:: python
+
+   from asyncio import run
+   from fieldclimate import FieldClimateClient
+
+   async def main():
+       async with FieldClimateClient(private_key="YOUR", public_key="KEYS") as client:
+           return await client.get_user()
+
+   if __name__ == "__main__":
+       run(main)
+
+
+Event Loops
+~~~~~~~~~~~
+
+**New in version 1.3.**
+
+The same FieldClimateClient class can be used to make asynchronous API requests under any modern event loop.
 This is thanks to asks being written with anyio_, which currently supports asyncio_, curio_, and trio_.
 
 .. _anyio: https://github.com/agronholm/anyio
@@ -50,15 +61,15 @@ HMAC credentials can be provided in several ways:
 
 1. Via the init constructor:
 
-   >>> FieldClimateClient(public_key='YOUR', private_key='KEYS')
+   >>> FieldClimateClient(public_key="YOUR", private_key="KEYS")
 
 2. Environment variables ``FIELDCLIMATE_PUBLIC_KEY`` and ``FIELDCLIMATE_PRIVATE_KEY``.
 
 3. Subclassing FieldClimateClient:
 
    >>> class MyClient(FieldClimateClient):
-   ...     private_key = 'YOUR'
-   ...     public_key = 'KEYS'
+   ...     private_key = "YOUR"
+   ...     public_key = "KEYS"
 
 4. If you use Django, you can use ``fieldclimate.django.DjangoFieldClimateClient`` in place of FieldClimateClient.
    This subclass will grab ``FIELDCLIMATE_PUBLIC_KEY`` and ``FIELDCLIMATE_PRIVATE_KEY`` from django's settings.
@@ -69,7 +80,7 @@ Methods
 
 The client has methods for each of the corresponding routes listed in the api docs.
 There's a lot of them, so see the full list of methods in ``fieldclimate/__init__.py`` for more details.
-Every method returns a dictionary response upon being awaited.
+Every method returns a JSON-like python object upon being awaited, like a dictionary or a list.
 
 Some methods will clean up their arguments in order to make working with the API in python easier.
 Here are some examples:
@@ -90,6 +101,8 @@ However, the underlying connection and cleaning utilities they use are all teste
 
 Connection Limits
 ~~~~~~~~~~~~~~~~~
+
+**New in version 1.3.**
 
 The connection limit can be raised by setting the connections argument when calling the FieldClimateClient constructor.
 
@@ -117,25 +130,12 @@ During my testing, I noticed the API starting to raise 502 errors when I overloa
 Please be courteous with your resource consumption!
 
 
-Examples
-~~~~~~~~
+Advanced Example
+~~~~~~~~~~~~~~~~
 
-Simple Example:
-
-.. code-block:: python
-
-   from asyncio import run
-   from fieldclimate import FieldClimateClient
-
-   async def main():
-       client = FieldClimateClient(private_key="YOUR", public_key="KEYS")
-       return await client.get_user()
-
-   if __name__ == "__main__":
-       run(main)
-
-
-Advanced Example:
+This function asks for some user data and gets the list of all user stations, at the same time.
+As soon as the stations come back, it counts them and sends off another request for each of the first 10 stations.
+Then each of those 10 station responses is printed, sorted by server reply time.
 
 .. code-block:: python
 
@@ -171,13 +171,14 @@ Advanced Example:
        run(main())
 
 
-Alternate implementations of these examples using curio and trio are the ``tests`` directory.
+Alternate curio and trio implementations are the ``tests`` directory,
+if you want to see how to use FieldClimateClient in those event loops (it's much of the same).
 
 
-Synchronous Usage Removed
-~~~~~~~~~~~~~~~~~~~~~~~~~
+Synchronous Usage
+~~~~~~~~~~~~~~~~~
 
-**New in UNRELEASED master branch:**
+**Removed in version 1.3.**
 
 In version 1.2, FieldClimateClient would automatically set up an asyncio event loop when methods were
 being called outside of an ``async with`` block.
@@ -189,7 +190,7 @@ So, with the switch to the ``asks`` backend, support for the old synchronous use
 If you were using FieldClimateClient's older 'synchronous usage' mode, you were already using a version of Python that
 allowed for async/await. The difference is that now you have to set up an event loop yourself.
 
-If you still *really* don't want to write any coroutines, the simplest way to make your code compatible with dev version
+If you still *really* don't want to write any coroutines, the simplest way to make your code compatible with version 1.3
 is to just wrap each method call with ``asyncio.run()``:
 
 .. code-block:: python

@@ -12,8 +12,8 @@ TODO
   - Increment major version to track with upstream.
 
 
-Unreleased
-----------
+1.3 (2019-09-23)
+----------------
 
 High-level changes:
 

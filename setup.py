@@ -2,7 +2,7 @@ from setuptools import setup
 
 setup(
     name="python-fieldclimate",
-    version="1.2",
+    version="1.3",
     description="A client for the iMetos FieldClimate API.",
     url="https://github.com/agrimgt/python-fieldclimate",
     long_description="\n\n".join(
