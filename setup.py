@@ -1,10 +1,8 @@
 from setuptools import setup
 
-import fieldclimate
-
 setup(
     name="python-fieldclimate",
-    version=fieldclimate.__version__,
+    version="1.2",
     description="A client for the iMetos FieldClimate API.",
     url="https://github.com/agrimgt/python-fieldclimate",
     long_description="\n\n".join(
@@ -14,7 +12,7 @@ setup(
             open("AUTHORS.rst").read(),
         )
     ),
-    author=fieldclimate.__author__,
+    author="Agrimanagement, Inc.",
     author_email="pmarshall@agrimgt.com",
     license="MIT",
     project_urls={"API Documentation": "https://api.fieldclimate.com/v1/docs/"},
