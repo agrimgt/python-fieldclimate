@@ -59,6 +59,7 @@ class FieldClimateClient(Session):
         headers = self.get_headers(method, path)
         # Session.request() will generate the full url using base_location and path.
         response = await self.request(method, path=path, data=data, headers=headers)
+        # This may raise json.JSONDecodeError if response is empty:
         return response.json()
 
     # Full description of all methods: https://api.fieldclimate.com/v1/docs/

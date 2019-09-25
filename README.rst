@@ -81,6 +81,7 @@ Methods
 The client has methods for each of the corresponding routes listed in the api docs.
 There's a lot of them, so see the full list of methods in ``fieldclimate/__init__.py`` for more details.
 Every method returns a JSON-like python object upon being awaited, like a dictionary or a list.
+If JSON can't be decoded, ``json.JSONDecodeError`` will be raised.
 
 Some methods will clean up their arguments in order to make working with the API in python easier.
 Here are some examples:
@@ -230,3 +231,4 @@ Ideas for PRs:
 
 - Exhaustive mocking to achieve full method test coverage.
 - OAuth 2.0 authentication.
+- Better Error handling.
