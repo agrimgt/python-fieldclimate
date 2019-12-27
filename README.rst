@@ -6,7 +6,7 @@ A client for the iMetos FieldClimate API: https://api.fieldclimate.com/v1/docs/
 
 To use this, you'll need HMAC credentials provided by iMetos. See their docs for more info.
 
-Requires Python 3.5 or better. Tested on Python 3.6. Depends on asks_ and pycryptodome_.
+Requires Python 3.6 or better. Depends on asks_ and pycryptodome_.
 
 .. _asks: https://github.com/theelous3/asks
 .. _pycryptodome: https://github.com/Legrandin/pycryptodome
